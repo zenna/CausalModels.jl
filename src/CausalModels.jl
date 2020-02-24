@@ -1,5 +1,9 @@
 module CausalModels
 
-greet() = print("Hello World!")
+using Distributions
+using Statistics
+export ExogenousVariable, EndogenousVariable, intervene, randomsample, prob
 
-end # module
+# Fill in the rest
+
+end
