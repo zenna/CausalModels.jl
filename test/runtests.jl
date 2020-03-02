@@ -29,6 +29,6 @@ u3 = (courtorder = 1, nervous = 0)
 @test isapprox(prob(dead), 0.75; atol = 0.01)
 
 # Construct intervention: what would dead have been if nervous was 0
-dead2 = intervene(dead, nervous, 0)
+# dead2 = intervene(dead, nervous, 0)
 
 @test isapprox(prob(dead2), 0.5; atol = 0.01)
