@@ -5,8 +5,6 @@ export ExogenousVariable, EndogenousVariable, randomsample, prob, intervene
 
 """
 Struct for an exogenous variable.
-@param name: name of variable.
-@param distribution: distribution of variable.
 """
 struct ExogenousVariable
     name
@@ -15,8 +13,6 @@ end
 
 """
 Struct for an endogenous variable.
-@param operator: relation between parent variables (e.g. |, identity, &).
-@param parents: parent variables on which given variable depends.
 """
 struct EndogenousVariable
     operator
@@ -25,7 +21,6 @@ end
 
 """
 Evalutes an endogenous variable given values of parent exogenous variables.
-@param u_: named tuple of exogenous variable values.
 """
 function (u::EndogenousVariable)(u_)
     evaluated_vars = map(parent -> (parent)(u_), u.parents)
@@ -34,7 +29,6 @@ end
 
 """
 Finds exogenous variable value from list of exogenous variable values.
-@param u_: named tuple of exogenous variable values.
 """
 function (u::ExogenousVariable)(u_)
     for name in keys(u_)
@@ -45,8 +39,7 @@ function (u::ExogenousVariable)(u_)
 end
 
 """
-Randomly samples value from an endogenous variable.
-@param u: endogenous variable to sample.
+Randomly samples value from a variable.
 """
 function randomsample(u)
     exogenous_values = Dict{Any,Any}()
@@ -69,19 +62,10 @@ function randomsample_helper(u::ExogenousVariable, dict::Dict{Any, Any})
 end
 
 """
-Randomly samples value from an exogenous variable.
-@param u: exogenous variable to sample.
-"""
-function randomsample(u::ExogenousVariable)
-    rand(u.distribution)
-end
-
-"""
 Compute probability that endogenous variable = 1.
-@param u: endogenous variable of which to compute probability.
 """
 function prob(u::EndogenousVariable)
-    NSAMPS = 10000
+    NSAMPS = 100000
     total = 0
     for i=1:NSAMPS
         total += randomsample(u)
@@ -91,7 +75,6 @@ end
 
 """
 Compute probability that exogenous variable = 1.
-@param u: exogenous variable of which to compute probability.
 """
 function prob(u::ExogenousVariable)
     params(u.distribution)[1] # get probability that exogenous variable is 1
