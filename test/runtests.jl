@@ -22,7 +22,18 @@ u2 = (courtorder = 0, nervous = 0)
 u3 = (courtorder = 1, nervous = 0)
 @test dead(u3) == 1
 
+@test randomsample(nervous) ∈ [0, 1]
+@test isapprox(prob(nervous), 0.5; atol = 0.01)
+
 # Return a random sample from `dead`
+
+@test randomsample(Bshoots) ∈ [0, 1]
+@test isapprox(prob(Bshoots), 0.5; atol = 0.01)
+
+
+@test randomsample(Ashoots) ∈ [0, 1]
+@test isapprox(prob(Ashoots), 0.75; atol = 0.01)
+
 @test randomsample(dead) ∈ [0, 1]
 
 # Compute probability that `dead` is 1
@@ -30,11 +41,12 @@ u3 = (courtorder = 1, nervous = 0)
 
 # Construct intervention: what would dead have been if nervous was 0
 dead2 = intervene(dead, nervous, 0)
+@test typeof(dead2) == CausalModels.ModifiedEndoVar
+@test randomsample(dead2) ∈ [0, 1]
 
 @test isapprox(prob(dead2), 0.5; atol = 0.01)
 
-
-dead_counterfactual = cond(dead2, dead)
-randsample(dead_counterfactual)
-prob_cf = prob(dead_counterfactual)
-@test isapprox(prob(prob_cf), 0.67; atol = 0.01)
+#dead_counterfactual = cond(dead2, dead)
+#randsample(dead_counterfactual)
+#prob_cf = prob(dead_counterfactual)
+#@test isapprox(prob_cf, 0.67; atol = 0.01)
