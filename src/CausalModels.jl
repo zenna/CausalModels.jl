@@ -48,9 +48,24 @@ end
 Randomly samples value from an endogenous variable.
 @param u: endogenous variable to sample.
 """
-function randomsample(u::EndogenousVariable)
-    sample_values = map(parent -> randomsample(parent), u.parents)
+function randomsample(u)
+    exogenous_values = Dict{Any,Any}()
+    randomsample_helper(u, exogenous_values)
+end
+
+function randomsample_helper(u::EndogenousVariable, dict::Dict{Any, Any})
+    sample_values = map(parent -> randomsample_helper(parent, dict), u.parents)
     reduce(u.operator, sample_values)
+end
+
+function randomsample_helper(u::ExogenousVariable, dict::Dict{Any, Any})
+    if haskey(dict, u.name)
+        getindex(dict, u.name)
+    else
+        val = rand(u.distribution)
+        push!(dict, u.name => val)
+        val
+    end
 end
 
 """
