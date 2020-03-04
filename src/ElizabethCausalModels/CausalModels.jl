@@ -5,7 +5,7 @@ module CausalModels
  export ExogenousVariable, EndogenousVariable, intervene, randomsample, prob
 
 
- """ """
+
 
 
  """Exogenous variables have a symbolic name and a stat which
