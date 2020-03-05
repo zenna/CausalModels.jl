@@ -46,7 +46,7 @@ dead2 = intervene(dead, nervous, 0)
 
 @test isapprox(prob(dead2), 0.5; atol = 0.01)
 
-#dead_counterfactual = cond(dead2, dead)
-#randsample(dead_counterfactual)
-#prob_cf = prob(dead_counterfactual)
-#@test isapprox(prob_cf, 0.67; atol = 0.01)
+dead_counterfactual = cond(dead2, dead)
+randomsample(dead_counterfactual)
+prob_cf = prob(dead_counterfactual)
+@test isapprox(prob_cf, 0.67; atol = 0.01)
