@@ -1,4 +1,4 @@
-module Core
+module CausalCore
 
 using Distributions: Distribution
 using Statistics

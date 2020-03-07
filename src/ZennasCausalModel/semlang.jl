@@ -2,7 +2,7 @@
 module SEMLang
 
 export @SEM, interpret, SEMSyntaxError
-using ..Core: ExogenousVariable, EndogenousVariable
+using ..CausalCore: ExogenousVariable, EndogenousVariable
 
 struct SEMSyntaxError <: Exception
   msg

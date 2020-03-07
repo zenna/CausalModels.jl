@@ -1,7 +1,7 @@
 using Reexport
 
 include("core.jl")
-@reexport using .Core
+@reexport using .CausalCore
 
 include("semlang.jl")
 @reexport using .SEMLang
