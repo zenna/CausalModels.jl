@@ -14,7 +14,7 @@
 # Markov chains have a special property: the probability that the process transitions from any state $x$ to any state $y$ depends only on the state $x$.
 
 # $$
-# P(X_{t+1} = y \mid X_t = x, X_{t-1} = x_{t-1}, \dots, X_0 = x_0) = FINISHME
+# P(X_{t+1} = y \mid X_t = x, X_{t-1} = x_{t-1}, \dots, X_0 = x_0) = P(X_{t+1} = y \mid X_t = x) = P_{xy}
 # $$
 
 # This property — sometimes called the Markov property — is what gives Markov chains their memoryless nature.
@@ -45,10 +45,10 @@
 # These properies are easily computed:
 
 # "Are all elements non-negative?"
-isnonnegative(K) = FINISHME
+isnonnegative(K) = all(x->x>0, K)
 
 "Are all rows probability vectors (sum to 1)"
-allrowspvecs(K) = FINISHME
+allrowspvecs(K) = all(x->isapprox(x,1.0,atol=0.1), sum(K, dims=(2)))
 
 "Is `K` a stochastic matrix?"
 isstochasticmat(K) = isnonnegative(K) && allrowspvecs(K)
@@ -83,14 +83,21 @@ import Plots, Cairo, Plots, Fontconfig
 
 "Simulate the Markov chain `K` for one step from `x`"
 function sim1(rng, x, K)
-  FINISHME
+  sample(rng, 1:size(K)[1], ProbabilityWeights(K[x,:]))
 end
 
 sim1(x, K) = sim1(Random.GLOBAL_RNG, x, K)
 
 "Simulate Markov chain for `n` steps"
+
 function simn(rng, x, K, n)
-  FINISHME
+  array = [x]
+  curr_x = x
+  for i in 1:n
+    curr_x = sim1(rng, curr_x, K)
+    append!(array,curr_x)
+  end
+  return array
 end
 
 simn(x, K, n) = simn(Random.GLOBAL_RNG, x, K, n)
@@ -113,7 +120,7 @@ Plots.histogram(simn(1, K, nsamples), label = false, title = "$nsamples Samples 
 # Naturally, self-loops correspond to cases where $K(x,x) > 0$.
 
 using GraphPlot, LightGraphs
-
+import Cairo, Fontconfig
 g = DiGraph(K)  # Creates a directed graph from the adjacency matrix
 gplot(g)
 
@@ -158,6 +165,7 @@ end
 
 using Plots
 
+import Cairo, Fontconfig
 anim = @animate for i=1:15
   plot(plotK(Ka, i), plotK(Kb, i), plotK(Kc, i), layout = (1, 3))
 end
@@ -177,20 +185,25 @@ gif(anim; fps = 2)
 # That is:
 
 # $$
-# \pi = FINISHME
+# \pi = \pi * K
 # $$
 
 # Stationarity is also easy to compute:
 
 # Hint: Use ≈ (isapprox) instead of equality due to floating point imprecision
-isstationary(π, K) = π*K ≈ π
-
+isstationary(π, K) = isapprox(π*K,π,atol=10^-8)
 
 # In the gif images above, only the third graph converges to its stationary distribution
 
 "`n` such that `K^n` is stationary distribution"
 function convergencepower(K)
-  FINISHME
+  n = 1
+  curr_K = K
+  while !all(x->isapprox(x,0,atol=10^-8),curr_K*K-curr_K)
+      curr_K = curr_K * K
+      n += 1
+  end
+  return n
 end
 
 @testset "Stationary distribution" begin
@@ -212,7 +225,7 @@ end
 using LightGraphs
 
 "A directed graph is irreducible if it is strongly connected"
-isirreducible(g::DiGraph) = FINISHME
+isirreducible(g::DiGraph) = LightGraphs.is_strongly_connected(g)
 
 "A stochastic matrix is irreudicble if associated graph is irreducible"
 isirreducible(K::Matrix) = isirreducible(DiGraph(K))

@@ -56,10 +56,10 @@ function randomsample(var, calculated=Dict())
 end
 
 # calculating experimental probability of event when no variable value has been set.
-function prob(var)
+function prob(var, numtrials = 100000)
     i = 0
     num_success = 0        
-    while i < 1000000
+    while i < numtrials
         if randomsample(var, Dict()) == 1
             num_success += 1
         end
@@ -106,5 +106,37 @@ function intervene(endo_var::EndogenousVariable, var::ExogenousVariable, var_val
     return mod_endo_var
 end
 
+function cond(var1, var2)
+    return (var1, var2, Dict())
+end
+
+function randomsample(vars::Tuple)
+    X = randomsample(vars[1])
+    x_dict = X.dict
+    Y = randomsample(vars[2])
+end
+
+function prob(vars::Tuple)
+    var1 = vars[1]
+    var2 = vars[2]
+    i = 0
+    num_success = 0   
+    dict_keys = collect(keys(var1.dict))
+    old_dict = var1.dict
+    new_dict = Dict()
+    for key in dict_keys
+        new_dict[key] = old_dict[key]
+    end 
+    while i < 1000000
+        # run one trial and tally successes
+        if randomsample(var1, new_dict) == 1
+            num_success += 1
+        end
+        i += 1
+    end
+    probvar1 =  num_success/i
+    
+    
+end
  
 end
