@@ -265,15 +265,26 @@ flip(rng, p) = rand(rng) < p
 flip(p) = flip(Random.GLOBAL_RNG)
 
 "Take one step from `x` using Metropolis to sample from `π` using proposal `K`"
-function simMetropolis1(rng, x, K, π)
-  FINISHME
+function simMetropolis1(rng,x,K,π)
+  y = sim1(rng, x, K)
+  p = min(1, (π(y)*K[y,x])/(π(x)*K[x,y]))
+  if flip(rng, p)
+    return y
+  else
+    return x
+  end
 end
-
+        
 simMetropolis1(x, K, π) = simMetropolis1(Random.GLOBAL_RNG, x, K, π)
 
 "Take `n` steps using Metropolis algorithm"
-function simMetropolisn(rng, x, K, π, n)
-  FINISHME
+function simMetropolisn(x, K, π, n)
+  array = [x]
+  for i in 1:n
+    x = simMetropolis1(rng, x, K, π)
+    push!(arr, x)
+  end
+  return array
 end
 
 simMetropolisn(x, K, π, n) = simMetropolisn(Random.GLOBAL_RNG, x, K, π, n)
