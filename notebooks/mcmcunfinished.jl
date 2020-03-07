@@ -1,6 +1,6 @@
 # # Markov Chain Monte Carlo
 
-# Markov Chain Monte Carlo (MCMC) describes a variety of methods that exploit __Markov chains__  in order to draw random samples from desired probability distributions.  
+# Markov Chain Monte Carlo (MCMC) describes a variety of methods that exploit __Markov chains__  in order to draw random samples from desired probability distributions.
 # Markov chains are stochastic processes that evolve over time and space.
 # I'll first describe them in detail, and show how a special class of Markov chains exhibit predictable long term behaviour, even when the individual steps are random.
 # Then I'll introduce methods which allow us to construct a Markov Chain whose long-term behaviour matches the behaviour we want.
@@ -24,7 +24,7 @@
 # Unfortunately, we would be wrong.
 # We might land on the CHANCE position. and depending on the CHANCE card we pick up — which depends on the CHANCE cards still available in the deck — have to roll again, or move some number of spots forward or backwards.
 # In other words there is some hidden state or memory that effects the transition probabilities.
-# Of course this is easily remedied by expanding what we consider to be the state space to include the state of the CHANCE cards.  
+# Of course this is easily remedied by expanding what we consider to be the state space to include the state of the CHANCE cards.
 
 # ## Matrix Representation
 # Since the state space $\chi$ is finite, we can represent a Markov chain as a matrix $K$ where $K(x, y)$ denotes the probability of moving from $x$ to $y$.
@@ -166,7 +166,7 @@ gif(anim; fps = 2)
 # ## Stationary Distributions
 
 # As we have just seen
-# Since $\chi$ is finite, we can represent a probability distribution over it as a probability vector. 
+# Since $\chi$ is finite, we can represent a probability distribution over it as a probability vector.
 # Then, if the initial state is specified by $\pi$, the distribution over states after one step in the chain is simply:
 
 # $$
