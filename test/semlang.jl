@@ -42,5 +42,6 @@ xsamples = [randomsample(cond(y, ispos)) for i = 1:10]
 Prim        := Bernoulli | Uniform | Normal | ...
 unaryop     := !
 binaryop    := + | - | * | / | > | >= | <= | < | ...
-expr        := FINISHME
+expr        := symbol ~ Prim | symbol = [Prim | expr] binaryop [Prim| expr] |
+                symbol = unaryop [Prim | expr] | symbol = [Prim | expr]
 """
