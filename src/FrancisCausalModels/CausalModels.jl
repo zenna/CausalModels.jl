@@ -1,5 +1,5 @@
 module CausalModels
 
-include("zennascausalmodel/CausalModels.jl")
+include("FrancisCausalModels/CausalModels.jl")
 
 end
