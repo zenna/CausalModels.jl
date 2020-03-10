@@ -1,5 +1,5 @@
 using CausalModels
-
+using Distributions
 using Test
 
 approxeq(x, y) = isapprox(x, y; atol = 0.01)
