@@ -45,10 +45,10 @@
 # These properies are easily computed:
 
 # "Are all elements non-negative?"
-isnonnegative(K) = FINISHME
+isnonnegative(K) = reduce(&, map(element -> element >= 0 ? true : false, K))
 
 "Are all rows probability vectors (sum to 1)"
-allrowspvecs(K) = FINISHME
+allrowspvecs(K) = reduce(&, map(row -> sum(row) ≈ 1, eachrow(K)))
 
 "Is `K` a stochastic matrix?"
 isstochasticmat(K) = isnonnegative(K) && allrowspvecs(K)
@@ -79,18 +79,24 @@ end
 
 using StatsBase: sample, ProbabilityWeights
 using Random
-import Plots, Cairo, Plots, Fontconfig
+using Plots, Cairo, Fontconfig
 
 "Simulate the Markov chain `K` for one step from `x`"
 function sim1(rng, x, K)
-  FINISHME
+  sample(rng, UnitRange{Int64}(1, size(K)[1]), ProbabilityWeights(K[x,:]))
 end
 
 sim1(x, K) = sim1(Random.GLOBAL_RNG, x, K)
 
 "Simulate Markov chain for `n` steps"
 function simn(rng, x, K, n)
-  FINISHME
+  prev_x = x
+  all_x = [x]
+  for i in 1:n
+    prev_x = sim1(rng, prev_x, K)
+    push!(all_x, prev_x)    
+  end
+  all_x
 end
 
 simn(x, K, n) = simn(Random.GLOBAL_RNG, x, K, n)
@@ -177,7 +183,7 @@ gif(anim; fps = 2)
 # That is:
 
 # $$
-# \pi = FINISHME
+# \pi = \pi K
 # $$
 
 # Stationarity is also easy to compute:
@@ -190,7 +196,13 @@ isstationary(π, K) = π*K ≈ π
 
 "`n` such that `K^n` is stationary distribution"
 function convergencepower(K)
-  FINISHME
+  curr_K = K
+  n = 1
+  while !(curr_K * K ≈ curr_K)
+    curr_K = curr_K * K
+    n = n + 1
+  end
+  n
 end
 
 @testset "Stationary distribution" begin
@@ -212,7 +224,7 @@ end
 using LightGraphs
 
 "A directed graph is irreducible if it is strongly connected"
-isirreducible(g::DiGraph) = FINISHME
+isirreducible(g::DiGraph) = is_strongly_connected(g)
 
 "A stochastic matrix is irreudicble if associated graph is irreducible"
 isirreducible(K::Matrix) = isirreducible(DiGraph(K))
@@ -253,14 +265,26 @@ flip(p) = flip(Random.GLOBAL_RNG)
 
 "Take one step from `x` using Metropolis to sample from `π` using proposal `K`"
 function simMetropolis1(rng, x, K, π)
-  FINISHME
+  y = sim1(rng, x, K)
+  p = min(1, (π(y)*K[y,x])/(π(x)*K[x,y]))
+  if flip(rng, p)
+    y
+  else
+    x
+  end
 end
 
 simMetropolis1(x, K, π) = simMetropolis1(Random.GLOBAL_RNG, x, K, π)
 
 "Take `n` steps using Metropolis algorithm"
 function simMetropolisn(rng, x, K, π, n)
-  FINISHME
+  curr_x = x
+  all_x = [x]
+  for i in 1:n
+    curr_x = simMetropolis1(rng, curr_x, K, π)
+    push!(all_x, curr_x)
+  end
+  all_x
 end
 
 simMetropolisn(x, K, π, n) = simMetropolisn(Random.GLOBAL_RNG, x, K, π, n)
