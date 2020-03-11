@@ -12,6 +12,7 @@ SEMSyntaxError() = SEMSyntaxError("")
 
 "Parse exogenous variable"
 function parseexo(line)
+  :($(line.args[1]) = ExogenousVariable($(Meta.quot(line.args[1])),$(line.args[2])))
 end
 
 "Parse endogenous variable `line`"
