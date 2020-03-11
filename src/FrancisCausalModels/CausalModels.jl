@@ -1,5 +1,7 @@
-module CausalModels
+using Reexport
 
-include("FrancisCausalModels/CausalModels.jl")
+include("core.jl")
+@reexport using .CausalCore
 
-end
+include("semlang.jl")
+@reexport using .SEMLang

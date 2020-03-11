@@ -10,12 +10,27 @@ end
 
 SEMSyntaxError() = SEMSyntaxError("")
 
+
+
 "Parse exogenous variable"
 function parseexo(line)
+    assignment,name,dist=line.args
+    return :(name=ExogenousVariable(name,dist))
 end
+##handles case where we have variable operator variable
 
 "Parse endogenous variable `line`"
 function parseendo(line)
+    name,exp=line.args
+    arguments=exp.args
+    if length(arguments)==2
+        return :(name=EndogenousVariable(arguments[1],(arguments[2],)))
+    elseif length(arguments)==3
+        return :(name=EndogenousVariable(arguments[1],(arguments[2],arguments[3])))
+    else
+        println("check parseendo function")
+    end
+    return endohelper(line.args)
 end
 
 "Structural Equation Model"
@@ -25,10 +40,25 @@ macro SEM(sem)
   end
   semlines = Expr[]
   for line in sem.args
-    # Hints:
-    # ignore the line if lina isa LineNumberNode
-    # Use esc to escape
-    # Use Meta.quot to put a symbol
+    println(line)
+    dump(line)
+    # # Hints:
+    # # ignore the line if lina isa LineNumberNode
+    # # Use esc to escape
+    # # Use Meta.quot to put a symbol
+
+    if line isa LineNumberNode
+        continue 
+    
+    elseif line isa ExogenousVariable
+
+    elseif line isa EndogenousVariable
+
+    elseif line isa expr
+
+    else
+        return SEMSyntaxError
+    end
   end
   Expr(:block, semlines...)
 end
