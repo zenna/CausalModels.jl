@@ -30,7 +30,6 @@ function parseendo(line)
     else
         println("check parseendo function")
     end
-    return endohelper(line.args)
 end
 
 "Structural Equation Model"
