@@ -80,7 +80,6 @@ function prob(mod_endo_var::ModifiedEndoVar)
         for key in dict_keys
             new_dict[key] = old_dict[key]
         end
-
         # run one trial and tally successes
         if randomsample(mod_endo_var.endo_var, new_dict) == 1
             num_success += 1
@@ -101,42 +100,5 @@ function randomsample(mod_endo_var::ModifiedEndoVar)
     return randomsample(mod_endo_var.endo_var, new_dict)
 end
 
-function intervene(endo_var::EndogenousVariable, var::ExogenousVariable, var_value::Int64)
-    mod_endo_var = ModifiedEndoVar(endo_var, Dict(var.name => var_value))
-    return mod_endo_var
-end
-
-function cond(var1, var2)
-    return (var1, var2, Dict())
-end
-
-function randomsample(vars::Tuple)
-    X = randomsample(vars[1])
-    x_dict = X.dict
-    Y = randomsample(vars[2])
-end
-
-function prob(vars::Tuple)
-    var1 = vars[1]
-    var2 = vars[2]
-    i = 0
-    num_success = 0   
-    dict_keys = collect(keys(var1.dict))
-    old_dict = var1.dict
-    new_dict = Dict()
-    for key in dict_keys
-        new_dict[key] = old_dict[key]
-    end 
-    while i < 1000000
-        # run one trial and tally successes
-        if randomsample(var1, new_dict) == 1
-            num_success += 1
-        end
-        i += 1
-    end
-    probvar1 =  num_success/i
-    
-    
-end
  
 end
