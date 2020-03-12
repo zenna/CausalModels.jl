@@ -39,8 +39,6 @@ macro SEM(sem)
   end
   semlines = Expr[]
   for line in sem.args
-    println(line)
-    dump(line)
     # # Hints:
     # # ignore the line if lina isa LineNumberNode
     # # Use esc to escape
@@ -49,12 +47,10 @@ macro SEM(sem)
     if line isa LineNumberNode
         continue 
     
-    elseif line isa ExogenousVariable
-
-    elseif line isa EndogenousVariable
-
-    elseif line isa expr
-
+    elseif line.head==:(=)
+        append!(semlines,parseendo(line))
+    elseif line.head==:(~)
+        append!(semlines,parseexo(line))
     else
         return SEMSyntaxError
     end
