@@ -12,6 +12,11 @@ struct ExogenousVariable{D <: Distribution} <: Variable
   dist::D
 end
 
+struct ExogenousVariable{D <: Distribution}
+  name::Symbol
+  dist::D
+end
+
 Base.show(io::IO, u::ExogenousVariable) = Base.print(io, "$(u.name) ~ $(u.dist)")
 
 """
@@ -23,6 +28,10 @@ struct EndogenousVariable{F, ARGS} <: Variable
   args::ARGS
 end
 
+struct EndogenousVariable{F, ARGS}
+  func::F 
+  args::ARGS
+end
 
 Base.show(io::IO, v::EndogenousVariable) = Base.print(io, "$(v.func)($(v.args...))")
 
