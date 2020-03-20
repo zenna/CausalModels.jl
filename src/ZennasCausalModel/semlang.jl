@@ -15,65 +15,34 @@ SEMSyntaxError() = SEMSyntaxError("")
 function parseexo(line)
   new_var = line.args[2]
   dist = line.args[3]
-  :($new_var = ExogenousVariable( $(Meta.quot(new_var)), $(esc(dist))))
+  esc(:($new_var = ExogenousVariable( $(Meta.quot(new_var)), $(dist))))
 end
 
-"Parse endogenous variable; code currently does not support multiple different
- operators in a single expression, but rather only the same operator:
- e.g. AShoots | BShoots | CShoots | ... is acceptable, but not
-      AShoots * BShoots + CShoots ... (throws an error)
-"
+"Parse endogenous variable"
 function parseendo(line)
-  newvar = line.args[1] # name of new variable being defined
-  argsExpr = line.args[2] # expression of (nested) arguments for new variable
-  binary_op = undef; # initialize binary operator
-  unary_op = undef; # initialize unary operator
+  new_var = line.args[1] # name of new variable being defined
+  args_expr = line.args[2] # expression of (nested) arguments for new variable
+  operator = identity # initialize operator
+  extracted_args_list = [] # list of argument expressions (un-nested)
   
-  # initialize un-nested list of arguments in string form; this is used
-  # to construct an un-nested argument tuple in the final return expression
-  extracted_args_list = []
-
-  while typeof(argsExpr) == Expr
-    if (length(argsExpr.args) == 2) # unary expression 
-      unary_op = argsExpr.args[1]
-    else # binary expression
-      if (binary_op != undef && binary_op != argsExpr.args[1])
-        throw(SEMSyntaxError("@SEM expects uniform operator in input line"))
-      end
-      binary_op = argsExpr.args[1]
-      extracted_arg = argsExpr.args[3]
-      if (typeof(extracted_arg) == Symbol)
-        extracted_arg_str = repr(extracted_arg)
-        extracted_arg_str = extracted_arg_str[2:length(extracted_arg_str)]
-        push!(extracted_args_list, extracted_arg_str)
-      else
-        push!(extracted_args_list, repr(extracted_arg))
-      end
+  while typeof(args_expr) == Expr
+    operator = args_expr.args[1]
+    if (length(args_expr.args) == 3) # binary expression 
+      extracted_arg = args_expr.args[3]
+      push!(extracted_args_list, extracted_arg)
     end
-    argsExpr = argsExpr.args[2]
+    args_expr = args_expr.args[2]
   end
 
-  # handle last argument extracted from nested structure
-  if typeof(argsExpr) == Symbol
-    push!(extracted_args_list, (repr(argsExpr))[2:length(repr(argsExpr))])
-  else # argList is a constant
-    push!(extracted_args_list, argsExpr)
-  end
-  # reverse order of extracted arguments to match input expression
-  extracted_args = reverse(extracted_args_list)
+  push!(extracted_args_list, args_expr) # add last argument extracted from nested structure
+  extracted_args = reverse(extracted_args_list) # reverse order of extracted arguments to match input expression
 
-  if binary_op == undef # expression is unary
-    extracted_arg = Meta.parse(extracted_args[1])
-    if unary_op == undef # operator is identity
-      :($newvar = EndogenousVariable(esc(identity), ($extracted_arg,)))
-    else # operator is not identity (!)
-      :($newvar = EndogenousVariable($(esc(unary_op)), ($extracted_arg,)))
-    end  
-  else # expression is binary
-    extracted_args_str = join(extracted_args, ",")
-    extracted_args = Meta.parse(extracted_args_str)
-    :($newvar = EndogenousVariable($(esc(binary_op)), $extracted_args))
-  end
+  if length(extracted_args) == 1
+    esc(:($new_var = EndogenousVariable($(operator), ($(extracted_args[1]),))))
+  else
+    extracted_args_tuple = :($(extracted_args...),)
+    esc(:($new_var = EndogenousVariable($operator, $extracted_args_tuple)))
+  end 
 end
 
 "Structural Equation Model"
@@ -86,8 +55,10 @@ macro SEM(sem)
     if typeof(line) == Expr
       if line.head == :(=)
         expr = parseendo(line)
-      else
+      elseif line.head == :call
         expr = parseexo(line)
+      else
+        throw(SEMSyntaxError())
       end
       push!(semlines, expr)
     end    
