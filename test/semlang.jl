@@ -3,7 +3,6 @@ using Distributions
 using Test
 
 approxeq(x, y) = isapprox(x, y; atol = 0.01)
-
 @SEM begin
     nervous ~ Bernoulli(0.5)
     courtorder ~ Bernoulli(0.5)
@@ -42,5 +41,5 @@ xsamples = [randomsample(cond(y, ispos)) for i = 1:10]
 Prim        := Bernoulli | Uniform | Normal | ...
 unaryop     := !
 binaryop    := + | - | * | / | > | >= | <= | < | ...
-expr        := FINISHME
+expr        := Prim | unaryop expr | expr binaryop expr
 """

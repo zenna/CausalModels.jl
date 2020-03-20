@@ -15,7 +15,7 @@ SEMSyntaxError() = SEMSyntaxError("")
 function parseexo(line)
   new_var = line.args[2]
   dist = line.args[3]
-  :($new_var = ExogenousVariable( $(Meta.quot(new_var)), $(dist)))
+  :($new_var = ExogenousVariable( $(Meta.quot(new_var)), $(esc(dist))))
 end
 
 "Parse endogenous variable; code currently does not support multiple different
@@ -65,14 +65,14 @@ function parseendo(line)
   if binary_op == undef # expression is unary
     extracted_arg = Meta.parse(extracted_args[1])
     if unary_op == undef # operator is identity
-      :($newvar = EndogenousVariable(identity, ($extracted_arg,)))
+      :($newvar = EndogenousVariable(esc(identity), ($extracted_arg,)))
     else # operator is not identity (!)
-      :($newvar = EndogenousVariable($unary_op, ($extracted_arg,)))
+      :($newvar = EndogenousVariable($(esc(unary_op)), ($extracted_arg,)))
     end  
   else # expression is binary
     extracted_args_str = join(extracted_args, ",")
     extracted_args = Meta.parse(extracted_args_str)
-    :($newvar = EndogenousVariable($binary_op, $extracted_args))
+    :($newvar = EndogenousVariable($(esc(binary_op)), $extracted_args))
   end
 end
 
