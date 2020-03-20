@@ -12,18 +12,25 @@ SEMSyntaxError() = SEMSyntaxError("")
 
 "Parse exogenous variable"
 function parseexo(line)
-  # name stored in line.args[2], distr in line.args[3]
-  # question: Is it bad practice to store line.args[2] in a named variable so macro is easier to understand?
-  return :($(line.args[2]) = ExogenousVariable($(Meta.quot(line.args[2])),$(line.args[3])))
+  name = line.args[2]
+  distr = line.args[3]
+  return :($(name) = ExogenousVariable($(Meta.quot(name)),$(distr)))
 end
 
 "Parse endogenous variable `line`"
 function parseendo(line)
   #if using identity function (will change if other unaryops need to be accounted for)
-  if typeof(line.args[2]) == Symbol
-    return :($(line.args[1]) = EndogenousVariable($(identity), ($(line.args[2]),)))
+  name = line.args[1]
+  causality = line.args[2]
+  #if caused by one variable
+  if typeof(causality) == Symbol
+    #assumes only identity func will be used, will modify if other unaryops need to be accounted for
+    return :($(name) = EndogenousVariable($(identity), ($(causality),)))
   else
-    return :($(line.args[1]) = EndogenousVariable($(line.args[2].args[1]), ($(line.args[2].args[2]), $(line.args[2].args[3]))))
+    logicalop = causality.args[1]
+    var1 = causality.args[2]
+    var2 = causality.args[3]
+    return :($(name) = EndogenousVariable($(logicalop), ($(var1), $(var2))))
   end
 end
 
@@ -33,14 +40,17 @@ macro SEM(sem)
     throw(SEMSyntaxError("@SEM expects a block expression as input but was passed a "))
   end
   semlines = Expr[]
-  for lineNum in 1:length(sem.args)
-    #if line isn't a LineNUmberNode 
-    if lineNum%2 == 0
-      line = sem.args[lineNum]
-      if line.args[1] == :~
+  for line in sem.args
+    #if line is an expression and not a LineNumberNode 
+    if typeof(line) == Expr
+      # if is symbol call and uses exogenous var assignment ~
+      if line.head == :call && line.args[1] == :~
         push!(semlines,parseexo(line))
-      else
+      # if is assignment
+      else if line.head == :(=)
         push!(semlines,parseendo(line))
+      else 
+        throw(SEMSyntaxError("@SEM expected an endogenous or exogenous variable but was passed neither"))
       end
     end
   end
