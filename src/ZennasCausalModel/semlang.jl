@@ -38,7 +38,7 @@ function parseendo(line)
       unary_op = argsExpr.args[1]
     else # binary expression
       if (binary_op != undef && binary_op != argsExpr.args[1])
-        throw(SEMSyntaxError("@SEM expects uniform operator in given line"))
+        throw(SEMSyntaxError("@SEM expects uniform operator in input line"))
       end
       binary_op = argsExpr.args[1]
       extracted_arg = argsExpr.args[3]
