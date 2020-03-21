@@ -3,7 +3,6 @@ using Distributions
 using Test
 
 approxeq(x, y) = isapprox(x, y; atol = 0.01)
-
 @SEM begin
     nervous ~ Bernoulli(0.5)
     courtorder ~ Bernoulli(0.5)
@@ -39,8 +38,18 @@ xsamples = [randomsample(cond(y, ispos)) for i = 1:10]
 # An SEM model is an `expr` defiend by the following grammar:
 
 """
-Prim        := Bernoulli | Uniform | Normal | ...
-unaryop     := !
-binaryop    := + | - | * | / | > | >= | <= | < | ...
-expr        := FINISHME
+`symbol` and `constant` are Julia symbol values and Julia constant values -- not 
+sure how to represent them concisely in the grammar.
+
+terminal     := symbol | constant
+params       := constant | params, constant
+Prim         := Bernoulli | Uniform | Normal | ...
+unary_op     := !
+binary_op    := + | - | * | / | > | >= | <= | < | ...
+unary_expr   := unary_op terminal | terminal
+binary_expr  := binary_expr binary_op terminal | terminal binary_op terminal
+exoline      := symbol ~ Prim(params) 
+endoline     := symbol = binary_expr | unary_expr
+line         := exoline | endoline
+expr         := (expr \n line) | line
 """
