@@ -21,14 +21,13 @@ end
 
 "Parse endogenous variable `line`"
 function parseendo(line)
-    name,exp=line.args
-    arguments=exp.args
-    if length(arguments)==2
-        return :(name=EndogenousVariable(arguments[1],(arguments[2],)))
-    elseif length(arguments)==3
-        return :(name=EndogenousVariable(arguments[1],(arguments[2],arguments[3])))
+    var_name,exp=line.args
+    if exp isa Symbol
+        return :(var_name=EndogenousVariable(var_name,(exp,)))
     else
-        println("check parseendo function")
+        arguments=exp.args
+        test= :(var_name=EndogenousVariable(arguments[1],(arguments[2],arguments[3])))
+        return test
     end
 end
 
@@ -43,16 +42,17 @@ macro SEM(sem)
     # # ignore the line if lina isa LineNumberNode
     # # Use esc to escape
     # # Use Meta.quot to put a symbol
-
     if line isa LineNumberNode
         continue 
     
     elseif line.head==:(=)
-        append!(semlines,parseendo(line))
-    elseif line.head==:(~)
-        append!(semlines,parseexo(line))
+        test2=parseendo(line)
+        push!(semlines,parseendo(line))
+    elseif line.args[1]==:(~)
+
+        push!(semlines,parseexo(line))
     else
-        return SEMSyntaxError
+        throw(SEMSyntaxError("@SEM expects an expression with some form of equality "))
     end
   end
   Expr(:block, semlines...)
