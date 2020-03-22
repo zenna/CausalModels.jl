@@ -14,7 +14,7 @@ end
 
 prob(dead)
 randomsample(dead)
-
+ 
 @SEM begin
     n ~ Poisson(0.5)
     x = n + 10
@@ -36,11 +36,15 @@ xsamples = [randomsample(cond(y, ispos)) for i = 1:10]
 @test prob(cond(isneg, ispos); n = 10) == 0.0
 
 # # Grammar  FINISHME
-# An SEM model is an `expr` defiend by the following grammar:
+# An SEM model is an `expr` defined by the following grammar:
 
 """
 Prim        := Bernoulli | Uniform | Normal | ...
 unaryop     := !
 binaryop    := + | - | * | / | > | >= | <= | < | ...
-expr        := FINISHME
+n           := Real >= 0
+line        := symbol ~ Prim(n) | symbol = [line | Prim(n)] |
+               symbol = [line | Prim(n)] binaryop [line | Prim(n)] | 
+               symbol = unaryop symbol
+Expr        := line | Expr line
 """
