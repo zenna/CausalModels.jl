@@ -26,6 +26,11 @@ function parseendo(line)
     if typeof(exp)== Symbol
         return :($(var_name)=EndogenousVariable($(identity),($(exp),)))
     else
+        arguments=exp.args
+        if length(arguments)==2
+            return :($(var_name)=EndogenousVariable($(arguments[1]),($(arguments[2]),)))
+        end
+
         arg1=exp.args[1]
         arg2=exp.args[2]
         arg3=exp.args[3]
@@ -54,7 +59,6 @@ macro SEM(sem)
         throw(SEMSyntaxError("@SEM expects an expression with some form of equality "))
     end
   end
-  println("before last command")
   return esc(Expr(:block, semlines...))
 
 end
