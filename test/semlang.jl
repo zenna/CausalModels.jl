@@ -2,7 +2,7 @@ using CausalModels
 
 using Test
 
-approxeq(x, y) = isapprox(x, y; atol = 0.01)
+# approxeq(x, y) = isapprox(x, y; atol = 0.01)
 
 @SEM begin
     nervous ~ Bernoulli(0.5)
@@ -42,5 +42,6 @@ xsamples = [randomsample(cond(y, ispos)) for i = 1:10]
 Prim        := Bernoulli | Uniform | Normal | ...
 unaryop     := !
 binaryop    := + | - | * | / | > | >= | <= | < | ...
-expr        := (Prim | unaryop Prim) (binaryop Prim | binaryop unaryop Prim)*
+expr        := (name = Prim binaryop Prim) | (name ~ Prim )
+
 """

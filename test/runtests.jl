@@ -39,7 +39,7 @@ using CausalModels, Distributions, Test
 # prob_cf = prob(dead_counterfactual)
 # @test isapprox(prob_cf, 0.67; atol = 0.01)
 
-# approxeq(x, y) = isapprox(x, y; atol = 0.01)
+approxeq(x, y) = isapprox(x, y; atol = 0.01)
 
 @SEM begin
     nervous ~ Bernoulli(0.5)

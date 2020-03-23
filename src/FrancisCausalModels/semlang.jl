@@ -15,19 +15,21 @@ SEMSyntaxError() = SEMSyntaxError("")
 "Parse exogenous variable"
 function parseexo(line)
     assignment,name,dist=line.args
-    return :(name=ExogenousVariable(name,dist))
+    return :($(name)=ExogenousVariable($(Meta.quot(name)),$(dist)))
 end
 ##handles case where we have variable operator variable
 
 "Parse endogenous variable `line`"
 function parseendo(line)
+    # line=line.args[1]
     var_name,exp=line.args
-    if exp isa Symbol
-        return :(var_name=EndogenousVariable(var_name,(exp,)))
+    if typeof(exp)== Symbol
+        return :($(var_name)=EndogenousVariable($(identity),($(exp),)))
     else
-        arguments=exp.args
-        test= :(var_name=EndogenousVariable(arguments[1],(arguments[2],arguments[3])))
-        return test
+        arg1=exp.args[1]
+        arg2=exp.args[2]
+        arg3=exp.args[3]
+        return :($(var_name)=EndogenousVariable($(arg1),($(arg2),$(arg3))))
     end
 end
 
@@ -44,18 +46,17 @@ macro SEM(sem)
     # # Use Meta.quot to put a symbol
     if line isa LineNumberNode
         continue 
-    
     elseif line.head==:(=)
-        test2=parseendo(line)
         push!(semlines,parseendo(line))
     elseif line.args[1]==:(~)
-
         push!(semlines,parseexo(line))
     else
         throw(SEMSyntaxError("@SEM expects an expression with some form of equality "))
     end
   end
-  Expr(:block, semlines...)
+  println("before last command")
+  return esc(Expr(:block, semlines...))
+
 end
 
 end
